@@ -1,27 +1,38 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:unbottled/models/models.dart';
+import 'package:unbottled/widgets/widgets.dart';
 
 class PointScreen extends StatelessWidget {
-  static route() => MaterialPageRoute(builder: (context) => PointScreen());
+  static route({@required Point point}) =>
+      MaterialPageRoute(builder: (context) => PointScreen(point: point));
+
+  const PointScreen({Key key, this.point}) : super(key: key);
+
+  final Point point;
 
   @override
   Widget build(BuildContext context) {
+    final latLng = LatLng(point.latitude, point.longitude);
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            backgroundColor: Colors.transparent,
+//            backgroundColor: Colors.transparent,
             expandedHeight: 300,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Hero(
-                tag: 'point-photo',
-                child: CachedNetworkImage(
-                  imageUrl: 'https://i.imgur.com/vgCTbOl.png',
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
+            flexibleSpace: point.photo != null
+                ? FlexibleSpaceBar(
+                    background: Hero(
+                      tag: 'point-photo',
+                      child: CachedNetworkImage(
+                        imageUrl: point.photo.url,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  )
+                : null,
           ),
           SliverList(
             delegate: SliverChildListDelegate([
@@ -33,15 +44,7 @@ class PointScreen extends StatelessWidget {
                   tag: 'point-taste',
                   child: IconTheme(
                     data: const IconThemeData(color: Colors.orangeAccent),
-                    child: Wrap(
-                      spacing: 4,
-                      children: [
-                        const Icon(Icons.star),
-                        const Icon(Icons.star),
-                        const Icon(Icons.star),
-                        const Icon(Icons.star_half),
-                      ],
-                    ),
+                    child: Rating(rating: point.averageTaste),
                   ),
                 ),
               ),
@@ -65,13 +68,13 @@ class PointScreen extends StatelessWidget {
                       myLocationButtonEnabled: false,
                       myLocationEnabled: true,
                       initialCameraPosition: CameraPosition(
-                        target: LatLng(10, 10),
+                        target: latLng,
                         zoom: 13,
                       ),
                       markers: {
                         Marker(
-                          markerId: MarkerId('sds'),
-                          position: LatLng(10, 10),
+                          markerId: MarkerId(point.id),
+                          position: latLng,
                         )
                       },
                     ),

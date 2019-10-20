@@ -4,7 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:unbottled/models/models.dart';
 import 'package:unbottled/screens/screens.dart';
+import 'package:unbottled/widgets/widgets.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -17,6 +19,19 @@ class _MainScreenState extends State<MainScreen> {
   final _mapCompleter = Completer<GoogleMapController>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _searchInputFocusNode = FocusNode();
+
+  final points = <Point>[
+    Point((b) => b
+      ..id = ''
+      ..createdAt = DateTime.now()
+      ..authorID = ''
+      ..latitude = 10
+      ..longitude = 10
+      ..averageTaste = 2.3),
+  ];
+
+  String _selectedPointId;
+  bool _mapCentering = false;
 
   @override
   void initState() {
@@ -41,8 +56,25 @@ class _MainScreenState extends State<MainScreen> {
             onMapCreated: (controller) => _mapCompleter.complete(controller),
             initialCameraPosition: const CameraPosition(
               target: _defaultCoordinates,
-              zoom: 13,
+              zoom: 4,
             ),
+            onCameraMoveStarted: () {
+              if (!_mapCentering) {
+                setState(() => _selectedPointId = null);
+              }
+            },
+            onCameraIdle: () => setState(() => _mapCentering = false),
+            markers: points
+                .map((point) => Marker(
+                    markerId: MarkerId(point.id),
+                    position: LatLng(point.latitude, point.longitude),
+                    onTap: () {
+                      setState(() {
+                        _selectedPointId = point.id;
+                        _mapCentering = true;
+                      });
+                    }))
+                .toSet(),
           ),
           SafeArea(
             child: Padding(
@@ -51,7 +83,7 @@ class _MainScreenState extends State<MainScreen> {
                 children: [
                   _buildSearchBar(context),
                   const Spacer(),
-                  _buildPointCard(context)
+                  if (_selectedPointId != null) _buildPointCard(context)
                 ],
               ),
             ),
@@ -122,54 +154,57 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildPointCard(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints.tightFor(height: 200),
-      child: Material(
-        elevation: 4,
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => Navigator.push(context, PointScreen.route()),
-          child: Stack(
-            alignment: Alignment.bottomLeft,
-            children: [
-              Hero(
-                tag: 'point-photo',
-                child: Material(
-                  child: Ink(
-                    // basically an Ink.image, but with borderRadius
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
-                      image: DecorationImage(
-                        image: CachedNetworkImageProvider(
-                            'https://i.imgur.com/vgCTbOl.png'),
-                        fit: BoxFit.cover,
+    final point = points.firstWhere((point) => point.id == _selectedPointId,
+        orElse: () => null);
+
+    return point != null
+        ? ConstrainedBox(
+            constraints: BoxConstraints.tightFor(height: 200),
+            child: Material(
+              elevation: 4,
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () =>
+                    Navigator.push(context, PointScreen.route(point: point)),
+                child: Stack(
+                  alignment: Alignment.bottomLeft,
+                  children: [
+                    Hero(
+                      tag: 'point-photo',
+                      child: Material(
+                        child: Ink(
+                          // basically an Ink.image, but with borderRadius
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4),
+                            image: DecorationImage(
+                              image: CachedNetworkImageProvider(point.photo !=
+                                      null
+                                  ? point.photo.id
+                                  : 'http://fakeimg.pl/300x200/?text=No+photo'),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Hero(
-                  tag: 'point-taste',
-                  child: IconTheme(
-                    data: const IconThemeData(color: Colors.orangeAccent),
-                    child: Wrap(
-                      spacing: 4,
-                      children: [
-                        const Icon(Icons.star),
-                        const Icon(Icons.star),
-                        const Icon(Icons.star),
-                        const Icon(Icons.star_half),
-                      ],
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Hero(
+                        tag: 'point-taste',
+                        child: IconTheme(
+                          data: const IconThemeData(color: Colors.white),
+                          child: Rating(
+                            rating: point.averageTaste ?? 0,
+                            trailing: false,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          )
+        : SizedBox();
   }
 }
