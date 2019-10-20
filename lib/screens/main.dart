@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:unbottled/models/models.dart';
 import 'package:unbottled/screens/screens.dart';
+import 'package:unbottled/store/store.dart';
 import 'package:unbottled/widgets/widgets.dart';
 
 class MainScreen extends StatefulWidget {
@@ -19,16 +21,6 @@ class _MainScreenState extends State<MainScreen> {
   final _mapCompleter = Completer<GoogleMapController>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _searchInputFocusNode = FocusNode();
-
-  final points = <Point>[
-    Point((b) => b
-      ..id = ''
-      ..createdAt = DateTime.now()
-      ..authorID = ''
-      ..latitude = 10
-      ..longitude = 10
-      ..averageTaste = 2.3),
-  ];
 
   String _selectedPointId;
   bool _mapCentering = false;
@@ -47,34 +39,37 @@ class _MainScreenState extends State<MainScreen> {
       key: _scaffoldKey,
       body: Stack(
         children: [
-          GoogleMap(
-            myLocationButtonEnabled: false,
-            myLocationEnabled: true,
-            tiltGesturesEnabled: false,
-            rotateGesturesEnabled: false,
-            mapToolbarEnabled: false,
-            onMapCreated: (controller) => _mapCompleter.complete(controller),
-            initialCameraPosition: const CameraPosition(
-              target: _defaultCoordinates,
-              zoom: 4,
+          StoreConnector<AppState, List<Point>>(
+            converter: (store) => store.state.points.toList(),
+            builder: (context, points) => GoogleMap(
+              myLocationButtonEnabled: false,
+              myLocationEnabled: true,
+              tiltGesturesEnabled: false,
+              rotateGesturesEnabled: false,
+              mapToolbarEnabled: false,
+              onMapCreated: (controller) => _mapCompleter.complete(controller),
+              initialCameraPosition: const CameraPosition(
+                target: _defaultCoordinates,
+                zoom: 4,
+              ),
+              onCameraMoveStarted: () {
+                if (!_mapCentering) {
+                  setState(() => _selectedPointId = null);
+                }
+              },
+              onCameraIdle: () => setState(() => _mapCentering = false),
+              markers: points
+                  .map((point) => Marker(
+                      markerId: MarkerId(point.id),
+                      position: LatLng(point.latitude, point.longitude),
+                      onTap: () {
+                        setState(() {
+                          _selectedPointId = point.id;
+                          _mapCentering = true;
+                        });
+                      }))
+                  .toSet(),
             ),
-            onCameraMoveStarted: () {
-              if (!_mapCentering) {
-                setState(() => _selectedPointId = null);
-              }
-            },
-            onCameraIdle: () => setState(() => _mapCentering = false),
-            markers: points
-                .map((point) => Marker(
-                    markerId: MarkerId(point.id),
-                    position: LatLng(point.latitude, point.longitude),
-                    onTap: () {
-                      setState(() {
-                        _selectedPointId = point.id;
-                        _mapCentering = true;
-                      });
-                    }))
-                .toSet(),
           ),
           SafeArea(
             child: Padding(
@@ -154,8 +149,10 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildPointCard(BuildContext context) {
-    final point = points.firstWhere((point) => point.id == _selectedPointId,
-        orElse: () => null);
+    final point = StoreProvider.of<AppState>(context).state.points.firstWhere(
+          (point) => point.id == _selectedPointId,
+          orElse: () => null,
+        );
 
     return point != null
         ? ConstrainedBox(
@@ -164,14 +161,15 @@ class _MainScreenState extends State<MainScreen> {
               elevation: 4,
               color: Colors.transparent,
               child: InkWell(
-                onTap: () =>
-                    Navigator.push(context, PointScreen.route(point: point)),
+                onTap: () => Navigator.push(
+                    context, PointScreen.route(pointID: point.id)),
                 child: Stack(
                   alignment: Alignment.bottomLeft,
                   children: [
                     Hero(
                       tag: 'point-photo',
                       child: Material(
+                        color: Colors.transparent,
                         child: Ink(
                           // basically an Ink.image, but with borderRadius
                           decoration: BoxDecoration(
