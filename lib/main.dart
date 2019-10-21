@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart' show thunkMiddleware;
+import 'package:unbottled/api/api.dart';
 import 'package:unbottled/app.dart';
 import 'package:unbottled/store/reducer.dart';
 import 'package:unbottled/store/store.dart';
@@ -12,5 +13,8 @@ void main() {
     middleware: [thunkMiddleware],
   );
 
-  runApp(UnbottledApp(store: store));
+  runApp(UnbottledApp(
+    store: store,
+    api: ServerApi(),
+  ));
 }
