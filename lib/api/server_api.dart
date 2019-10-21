@@ -1,15 +1,43 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:unbottled/api/api.dart';
 import 'package:unbottled/models/models.dart';
 
 class ServerApi implements Api {
+  final _client = Dio(BaseOptions(
+    baseUrl: 'http://localhost:8080',
+  ));
+
   String _accessToken;
+
+  FutureOr<T> _handleError<T>(error) {
+    if (error is DioError) {
+      final response = error.response;
+      print(response);
+      return Future<T>.error(
+          '${response.statusCode}: ${response.data['error'] ?? ''}');
+    }
+
+    throw error;
+  }
 
   @override
   Future<User> authenticate(String emailOrUsername, String password) {
-    // TODO: implement authenticate
-    return null;
+    return _client
+        .post('/auth/authenticate', data: {
+          'email_or_username': emailOrUsername,
+          'password': password,
+        })
+        .then((response) {
+          _accessToken = response.data['access_token'];
+
+          return response.data['user'];
+        })
+        .then(
+            (user) => modelsSerializers.deserializeWith(User.serializer, user))
+        .catchError((err) => _handleError(err));
   }
 
   @override
@@ -40,5 +68,4 @@ class ServerApi implements Api {
     // TODO: implement addPoint
     return null;
   }
-
 }

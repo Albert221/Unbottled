@@ -13,6 +13,7 @@ dependencies:
   built_collection: ^4.2.2
   built_value: ^6.7.1
   cached_network_image: ^1.1.2+1
+  dio: ^3.0.3
   flutter_redux: ^0.5.3
   google_maps_flutter: ^0.5.21+8
   location: ^2.3.5
