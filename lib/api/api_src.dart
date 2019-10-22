@@ -5,6 +5,8 @@ import 'package:unbottled/models/models.dart';
 abstract class Api {
   Future<User> authenticate(String emailOrUsername, String password);
 
+  Future<User> refreshToken(String oldToken);
+
   Future<void> signOut();
 
   Future<User> createAccount(String email, String username, String password);
