@@ -10,17 +10,6 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
   AppState._();
 
   factory AppState([updates(AppStateBuilder b)]) {
-    return _$AppState
-        ._(
-            points: BuiltList([
-          Point((b) => b
-            ..id = ''
-            ..createdAt = DateTime.now()
-            ..authorID = ''
-            ..latitude = 10
-            ..longitude = 10
-            ..averageTaste = 2.3),
-        ]))
-        .rebuild(updates);
+    return _$AppState._(points: BuiltList()).rebuild(updates);
   }
 }

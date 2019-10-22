@@ -8,7 +8,7 @@ import 'package:unbottled/models/models.dart';
 
 class ServerApi implements Api {
   final _client = Dio(BaseOptions(
-    baseUrl: 'http://localhost:8080',
+    baseUrl: 'http://10.0.2.2:8080',
   ));
 
   String _accessToken;
@@ -69,8 +69,8 @@ class ServerApi implements Api {
     return _client
         .get('/point/$lat,$lng,$radius')
         .then((response) => response.data['points'])
-        .then((points) => BuiltList.from(points).map(pointDeserialize).toList())
-        .catchError((err) => _handleError<User>(err));
+        .then((points) => List.from(points).map(pointDeserialize).toList())
+        .catchError((err) => _handleError<List<Point>>(err));
   }
 
   @override
@@ -87,6 +87,10 @@ class ServerApi implements Api {
 
   FutureOr<T> _handleError<T>(error) {
     if (error is DioError) {
+      if (error.error is SocketException) {
+        return Future<T>.error('Cannot connect to the server');
+      }
+
       final response = error.response;
       return Future<T>.error(
           '${response.statusCode}: ${response.data['error'] ?? ''}');

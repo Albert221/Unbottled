@@ -31,6 +31,26 @@ class _MainScreenState extends State<MainScreen> {
 
     _searchInputFocusNode.addListener(() => setState(() {}));
     Location().requestPermission().then((_) => setState(() {}));
+
+    _updatePoints();
+  }
+
+  void _updatePoints() {
+    _mapCompleter.future.then((controller) async {
+      final center = await controller.getLatLng(ScreenCoordinate(
+        x: MediaQuery.of(context).size.width ~/ 2,
+        y: MediaQuery.of(context).size.height ~/ 2,
+      ));
+
+      StoreProvider.of<AppState>(context).dispatch(
+        fetchPoints(
+          ApiProvider.of(context),
+          center.latitude,
+          center.longitude,
+          10000,
+        ),
+      );
+    });
   }
 
   @override
@@ -57,7 +77,10 @@ class _MainScreenState extends State<MainScreen> {
                   setState(() => _selectedPointId = null);
                 }
               },
-              onCameraIdle: () => setState(() => _mapCentering = false),
+              onCameraIdle: () {
+                setState(() => _mapCentering = false);
+                _updatePoints();
+              },
               markers: points
                   .map((point) => Marker(
                       markerId: MarkerId(point.id),
@@ -157,50 +180,11 @@ class _MainScreenState extends State<MainScreen> {
     return point != null
         ? ConstrainedBox(
             constraints: BoxConstraints.tightFor(height: 200),
-            child: Material(
-              elevation: 4,
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => Navigator.push(
-                    context, PointScreen.route(pointID: point.id)),
-                child: Stack(
-                  alignment: Alignment.bottomLeft,
-                  children: [
-                    Hero(
-                      tag: 'point-photo',
-                      child: Material(
-                        color: Colors.transparent,
-                        child: Ink(
-                          // basically an Ink.image, but with borderRadius
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            image: DecorationImage(
-                              image: CachedNetworkImageProvider(point.photo !=
-                                      null
-                                  ? point.photo.id
-                                  : 'http://fakeimg.pl/300x200/?text=No+photo'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Hero(
-                        tag: 'point-taste',
-                        child: IconTheme(
-                          data: const IconThemeData(color: Colors.white),
-                          child: Rating(
-                            rating: point.averageTaste ?? 0,
-                            trailing: false,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            child: PointCard(
+              photoUrl: point.photo?.url,
+              averageTaste: point.averageTaste,
+              onTap: () =>
+                  Navigator.push(context, PointScreen.route(pointID: point.id)),
             ),
           )
         : SizedBox();

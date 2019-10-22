@@ -21,13 +21,14 @@ class PointScreen extends StatelessWidget {
           store.state.points.firstWhere((point) => point.id == pointID),
       builder: (builder, point) {
         final latLng = LatLng(point.latitude, point.longitude);
+        final photoAvailable = point.photo != null && point.photo.url != null;
 
         return Scaffold(
           body: CustomScrollView(
             slivers: [
               SliverAppBar(
-                expandedHeight: 300,
-                flexibleSpace: point.photo != null
+                expandedHeight: photoAvailable ? 300 : null,
+                flexibleSpace: photoAvailable
                     ? FlexibleSpaceBar(
                         background: Hero(
                           tag: 'point-photo',

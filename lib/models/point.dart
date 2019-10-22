@@ -37,6 +37,7 @@ abstract class Photo implements Built<Photo, PhotoBuilder> {
 
   String get filename;
 
+  @nullable
   String get url;
 
   Photo._();

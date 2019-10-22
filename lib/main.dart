@@ -10,7 +10,13 @@ void main() {
   final store = Store<AppState>(
     rootReducer,
     initialState: AppState(),
-    middleware: [thunkMiddleware],
+    middleware: [
+      thunkMiddleware,
+      (store, action, next) {
+        print(action.toString());
+        next(action);
+      },
+    ],
   );
 
   runApp(UnbottledApp(
