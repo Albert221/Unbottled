@@ -14,7 +14,7 @@ class MyPointsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My points'),
+        title: const Text('My points'),
       ),
       body: StoreConnector<AppState, List<Point>>(
         onInit: (store) => store.dispatch(
@@ -58,13 +58,10 @@ class MyPointsScreen extends StatelessWidget {
                               vertical: 16,
                               horizontal: 24,
                             ),
-                            child: Hero(
-                              tag: 'point-rating',
-                              child: IconTheme(
-                                data: const IconThemeData(
-                                    color: Colors.orangeAccent),
-                                child: Rating(rating: point.averageTaste),
-                              ),
+                            child: IconTheme(
+                              data: const IconThemeData(
+                                  color: Colors.orangeAccent),
+                              child: Rating(rating: point.averageTaste),
                             ),
                           ),
                         ],

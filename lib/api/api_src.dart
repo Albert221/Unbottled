@@ -17,5 +17,5 @@ abstract class Api {
 
   Future<Photo> uploadPhoto(File photo);
 
-  Future<Point> addPoint(double lat, double lng, String photoID);
+  Future<Point> addPoint(double lat, double lng, [String photoID]);
 }

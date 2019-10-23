@@ -203,7 +203,8 @@ class _MainScreenState extends State<MainScreen> {
                       ListTile(
                         leading: const Icon(Icons.add),
                         title: const Text('Add a point'),
-                        onTap: () {},
+                        onTap: () =>
+                            Navigator.push(context, AddPointScreen.route()),
                       ),
                       ListTile(
                         leading: const Icon(Icons.stars),

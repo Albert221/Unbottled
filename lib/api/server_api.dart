@@ -92,11 +92,18 @@ class ServerApi implements Api {
   }
 
   @override
-  Future<Point> addPoint(double lat, double lng, String photoID) {
+  Future<Point> addPoint(double lat, double lng, [String photoID]) {
     assert(_accessToken != null);
 
-    // TODO: implement addPoint
-    return null;
+    return _client
+        .post('/point', data: {
+          'latitude': lat,
+          'longitude': lng,
+          'photo_id': photoID,
+        })
+        .then((response) => response.data['point'])
+        .then(pointDeserialize)
+        .catchError((err) => _handleError<List<Point>>(err));
   }
 
   FutureOr<T> _handleError<T>(error) {
