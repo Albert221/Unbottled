@@ -45,18 +45,18 @@ class PointCard extends StatelessWidget {
                         Stack(
                           alignment: Alignment.center,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.photo,
                               size: 32,
                               color: Colors.black54,
                             ),
-                            Icon(
+                            const Icon(
                               Icons.block,
                               size: 64,
                             ),
                           ],
                         ),
-                        SizedBox(width: 16),
+                        const SizedBox(width: 16),
                         Text(
                           'No photo',
                           style: Theme.of(context).textTheme.title,
@@ -69,7 +69,9 @@ class PointCard extends StatelessWidget {
               child: Hero(
                 tag: 'point-taste',
                 child: IconTheme(
-                  data: const IconThemeData(color: Colors.white),
+                  data: IconThemeData(
+                    color: photoUrl != null ? Colors.white : Colors.black,
+                  ),
                   child: Rating(
                     rating: averageTaste ?? 0,
                     trailing: false,

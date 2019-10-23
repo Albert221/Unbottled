@@ -172,21 +172,22 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildPointCard(BuildContext context) {
-    final point = StoreProvider.of<AppState>(context).state.points.firstWhere(
-          (point) => point.id == _selectedPointId,
-          orElse: () => null,
-        );
-
-    return point != null
-        ? ConstrainedBox(
-            constraints: BoxConstraints.tightFor(height: 200),
-            child: PointCard(
-              photoUrl: point.photo?.url,
-              averageTaste: point.averageTaste,
-              onTap: () =>
-                  Navigator.push(context, PointScreen.route(pointID: point.id)),
-            ),
-          )
-        : SizedBox();
+    return StoreConnector<AppState, Point>(
+      converter: (store) => store.state.points.firstWhere(
+        (point) => point.id == _selectedPointId,
+        orElse: () => null,
+      ),
+      builder: (context, point) => point != null
+          ? ConstrainedBox(
+              constraints: BoxConstraints.tightFor(height: 200),
+              child: PointCard(
+                photoUrl: point.photo?.url,
+                averageTaste: point.averageTaste,
+                onTap: () => Navigator.push(
+                    context, PointScreen.route(pointID: point.id)),
+              ),
+            )
+          : const SizedBox(),
+    );
   }
 }

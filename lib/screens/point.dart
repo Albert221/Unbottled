@@ -43,8 +43,8 @@ class PointScreen extends StatelessWidget {
               SliverList(
                 delegate: SliverChildListDelegate([
                   ListTile(
-                    leading: Icon(Icons.local_pizza),
-                    title: Text('Taste'),
+                    leading: const Icon(Icons.local_pizza),
+                    title: const Text('Taste'),
                     subtitle: Text('3.5 stars'),
                     trailing: Hero(
                       tag: 'point-taste',
@@ -55,12 +55,12 @@ class PointScreen extends StatelessWidget {
                     ),
                   ),
                   ListTile(
-                    leading: Icon(Icons.add_comment),
-                    title: Text('Add your rating'),
+                    leading: const Icon(Icons.add_comment),
+                    title: const Text('Add your rating'),
                     onTap: () {},
                   ),
                   const SizedBox(height: 16),
-                  ListTile(
+                  const ListTile(
                     leading: Icon(Icons.place),
                     title: Text('Location'),
                     subtitle: Text('No data'),
