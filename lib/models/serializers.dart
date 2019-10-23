@@ -15,3 +15,5 @@ final userDeserialize =
     (user) => modelsSerializers.deserializeWith(User.serializer, user);
 final pointDeserialize =
     (point) => modelsSerializers.deserializeWith(Point.serializer, point);
+final photoDeserialize =
+    (point) => modelsSerializers.deserializeWith(Photo.serializer, point);

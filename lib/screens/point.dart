@@ -2,23 +2,36 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:unbottled/models/models.dart';
 import 'package:unbottled/store/store.dart';
 import 'package:unbottled/widgets/widgets.dart';
 
-class PointScreen extends StatelessWidget {
+class PointScreen extends StatefulWidget {
   static route({@required String pointID}) =>
       MaterialPageRoute(builder: (context) => PointScreen(pointID: pointID));
 
+  final String pointID;
+
   const PointScreen({Key key, this.pointID}) : super(key: key);
 
-  final String pointID;
+  @override
+  _PointScreenState createState() => _PointScreenState();
+}
+
+class _PointScreenState extends State<PointScreen> {
+  void _addPhoto() async {
+    final image = await ImagePicker.pickImage(source: ImageSource.camera);
+    ApiProvider.of(context).uploadPhoto(image).then((photo) {
+      print(photo);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, Point>(
       converter: (store) =>
-          store.state.points.firstWhere((point) => point.id == pointID),
+          store.state.points.firstWhere((point) => point.id == widget.pointID),
       builder: (builder, point) {
         final latLng = LatLng(point.latitude, point.longitude);
         final photoAvailable = point.photo != null && point.photo.url != null;
@@ -42,6 +55,22 @@ class PointScreen extends StatelessWidget {
               ),
               SliverList(
                 delegate: SliverChildListDelegate([
+                  StoreConnector<AppState, bool>(
+                    converter: (store) =>
+                        store.state.auth.user?.id == point.authorID,
+                    builder: (context, authoring) => authoring
+                        ? Column(
+                            children: [
+                              ListTile(
+                                leading: const Icon(Icons.add_a_photo),
+                                title: const Text('Add point photo'),
+                                onTap: _addPhoto,
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                          )
+                        : const SizedBox(),
+                  ),
                   ListTile(
                     leading: const Icon(Icons.local_pizza),
                     title: const Text('Taste'),

@@ -87,8 +87,15 @@ class ServerApi implements Api {
   Future<Photo> uploadPhoto(File photo) {
     assert(_accessToken != null);
 
-    // TODO: implement uploadPhoto
-    return null;
+    return _client
+        .post(
+          '/point/photo',
+          data: photo.readAsBytesSync(),
+          options: Options(headers: {'Content-Type': 'image/json'}),
+        )
+        .then((response) => response.data['photo'])
+        .then(photoDeserialize)
+        .catchError((err) => _handleError<User>(err));
   }
 
   @override
