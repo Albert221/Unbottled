@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -108,28 +107,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.power_settings_new),
-              title: const Text('Sign out'),
-              onTap: () {},
-            ),
-            const SizedBox(height: 16),
-            ListTile(
-              leading: const Icon(Icons.add),
-              title: const Text('Add a point'),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: const Icon(Icons.stars),
-              title: const Text('My points'),
-              onTap: () {},
-            ),
-          ],
-        ),
-      ),
+      drawer: _buildDrawer(context),
     );
   }
 
@@ -188,6 +166,65 @@ class _MainScreenState extends State<MainScreen> {
               ),
             )
           : const SizedBox(),
+    );
+  }
+
+  Widget _buildDrawer(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final onPrimary = Theme.of(context).colorScheme.onPrimary;
+
+    return Drawer(
+      child: ListView(
+        children: [
+          StoreConnector<AppState, bool>(
+            converter: (store) => store.state.auth.authenticated,
+            builder: (context, signedIn) => signedIn
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      DrawerHeader(
+                        decoration: BoxDecoration(color: primary),
+                        child: Text(
+                          'Albert221',
+                          style: TextStyle(color: onPrimary),
+                        ),
+                      ),
+                      StoreConnector<AppState, VoidCallback>(
+                        converter: (store) => () => store.dispatch(
+                              signOut(ApiProvider.of(context)),
+                            ),
+                        builder: (context, signOut) => ListTile(
+                          leading: const Icon(Icons.power_settings_new),
+                          title: const Text('Sign out'),
+                          onTap: signOut,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ListTile(
+                        leading: const Icon(Icons.add),
+                        title: const Text('Add a point'),
+                        onTap: () {},
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.stars),
+                        title: const Text('My points'),
+                        onTap: () {},
+                      ),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.person_add),
+                        title: const Text('Sign in'),
+                        onTap: () =>
+                            Navigator.push(context, SignInScreen.route()),
+                      ),
+                    ],
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }
