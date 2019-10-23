@@ -208,7 +208,8 @@ class _MainScreenState extends State<MainScreen> {
                       ListTile(
                         leading: const Icon(Icons.stars),
                         title: const Text('My points'),
-                        onTap: () {},
+                        onTap: () =>
+                            Navigator.push(context, MyPointsScreen.route()),
                       ),
                     ],
                   )

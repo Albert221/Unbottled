@@ -73,13 +73,28 @@ class ServerApi implements Api {
   }
 
   @override
+  Future<List<Point>> getMyPoints() {
+    assert(_accessToken != null);
+
+    return _client
+        .get('/point/mine')
+        .then((response) => response.data['points'])
+        .then((points) => List.from(points).map(pointDeserialize).toList())
+        .catchError((err) => _handleError<List<Point>>(err));
+  }
+
+  @override
   Future<Photo> uploadPhoto(File photo) {
+    assert(_accessToken != null);
+
     // TODO: implement uploadPhoto
     return null;
   }
 
   @override
   Future<Point> addPoint(double lat, double lng, String photoID) {
+    assert(_accessToken != null);
+
     // TODO: implement addPoint
     return null;
   }

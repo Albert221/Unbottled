@@ -13,6 +13,8 @@ abstract class Api {
 
   Future<List<Point>> getPoints(double lat, double lng, double radius);
 
+  Future<List<Point>> getMyPoints();
+
   Future<Photo> uploadPhoto(File photo);
 
   Future<Point> addPoint(double lat, double lng, String photoID);

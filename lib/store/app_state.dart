@@ -8,6 +8,8 @@ part 'app_state.g.dart';
 abstract class AppState implements Built<AppState, AppStateBuilder> {
   AuthState get auth;
 
+  BuiltList<Point> get myPoints;
+
   BuiltList<Point> get points;
 
   AppState._();
@@ -16,6 +18,7 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
     return _$AppState
         ._(
           auth: AuthState(),
+          myPoints: BuiltList(),
           points: BuiltList(),
         )
         .rebuild(updates);
