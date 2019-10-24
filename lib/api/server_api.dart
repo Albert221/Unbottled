@@ -7,7 +7,7 @@ import 'package:unbottled/models/models.dart';
 
 class ServerApi implements Api {
   final _client = Dio(BaseOptions(
-    baseUrl: 'http://10.0.2.2:8080',
+    baseUrl: 'http://vweb.codebucket.de:8242',
   ));
 
   String _accessToken;
@@ -87,15 +87,18 @@ class ServerApi implements Api {
   Future<Photo> uploadPhoto(File photo) {
     assert(_accessToken != null);
 
+    print(photo.path);
+
     return _client
         .post(
           '/point/photo',
-          data: photo.readAsBytesSync(),
-          options: Options(headers: {'Content-Type': 'image/json'}),
+          data: FormData.fromMap({
+            'photo': MultipartFile.fromFileSync(photo.path),
+          }),
         )
         .then((response) => response.data['photo'])
         .then(photoDeserialize)
-        .catchError((err) => _handleError<User>(err));
+        .catchError((err) => _handleError<Photo>(err));
   }
 
   @override

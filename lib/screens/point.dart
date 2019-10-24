@@ -30,11 +30,17 @@ class _PointScreenState extends State<PointScreen> {
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, Point>(
-      converter: (store) =>
-          store.state.points.firstWhere((point) => point.id == widget.pointID),
+      converter: (store) => store.state.points.firstWhere(
+        (point) => point.id == widget.pointID,
+        orElse: () => null,
+      ),
       builder: (builder, point) {
+        if (point == null) {
+          return Scaffold();
+        }
+
         final latLng = LatLng(point.latitude, point.longitude);
-        final photoAvailable = point.photo != null && point.photo.url != null;
+        final photoAvailable = point.photo?.url?.isNotEmpty == true;
 
         return Scaffold(
           body: CustomScrollView(
@@ -57,8 +63,8 @@ class _PointScreenState extends State<PointScreen> {
                 delegate: SliverChildListDelegate([
                   StoreConnector<AppState, bool>(
                     converter: (store) =>
-                        store.state.auth.user?.id == point.authorID,
-                    builder: (context, authoring) => authoring
+                        store.state.auth.user?.id == point.authorID && point.photo?.url?.isEmpty != false,
+                    builder: (context, showAddPhoto) => showAddPhoto
                         ? Column(
                             children: [
                               ListTile(

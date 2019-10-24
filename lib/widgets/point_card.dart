@@ -21,7 +21,7 @@ class PointCard extends StatelessWidget {
         child: Stack(
           alignment: Alignment.bottomLeft,
           children: [
-            photoUrl != null
+            photoUrl?.isNotEmpty == true
                 ? Hero(
                     tag: 'point-photo',
                     child: Material(

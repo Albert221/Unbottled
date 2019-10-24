@@ -35,8 +35,6 @@ abstract class Photo implements Built<Photo, PhotoBuilder> {
   @BuiltValueField(wireName: 'author_id')
   String get authorID;
 
-  String get filename;
-
   @nullable
   String get url;
 
