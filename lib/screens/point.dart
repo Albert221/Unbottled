@@ -122,6 +122,9 @@ class _PointScreenState extends State<PointScreen> {
                             Marker(
                               markerId: MarkerId(point.id),
                               position: latLng,
+                              icon: BitmapDescriptor.defaultMarkerWithHue(
+                                BitmapDescriptor.hueAzure,
+                              ),
                             )
                           },
                         ),

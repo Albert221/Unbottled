@@ -84,6 +84,9 @@ class _MainScreenState extends State<MainScreen> {
                   .map((point) => Marker(
                       markerId: MarkerId(point.id),
                       position: LatLng(point.latitude, point.longitude),
+                      icon: BitmapDescriptor.defaultMarkerWithHue(
+                        BitmapDescriptor.hueAzure,
+                      ),
                       onTap: () {
                         setState(() {
                           _selectedPointId = point.id;

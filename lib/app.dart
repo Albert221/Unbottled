@@ -25,6 +25,9 @@ class UnbottledApp extends StatelessWidget {
         child: MaterialApp(
           title: 'Unbottled',
           home: MainScreen(),
+          theme: ThemeData.light().copyWith(
+            primaryColor: Colors.lightBlue,
+          ),
         ),
       ),
     );

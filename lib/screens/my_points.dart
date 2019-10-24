@@ -48,6 +48,9 @@ class MyPointsScreen extends StatelessWidget {
                                   Marker(
                                     markerId: MarkerId(point.id),
                                     position: latLng,
+                                    icon: BitmapDescriptor.defaultMarkerWithHue(
+                                      BitmapDescriptor.hueAzure,
+                                    ),
                                   ),
                                 },
                               ),
