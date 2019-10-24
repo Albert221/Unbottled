@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:unbottled/models/models.dart';
 import 'package:unbottled/store/store.dart';
 import 'package:unbottled/widgets/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PointScreen extends StatefulWidget {
   static route({@required String pointID}) =>
@@ -63,7 +64,8 @@ class _PointScreenState extends State<PointScreen> {
                 delegate: SliverChildListDelegate([
                   StoreConnector<AppState, bool>(
                     converter: (store) =>
-                        store.state.auth.user?.id == point.authorID && point.photo?.url?.isEmpty != false,
+                        store.state.auth.user?.id == point.authorID &&
+                        point.photo?.url?.isEmpty != false,
                     builder: (context, showAddPhoto) => showAddPhoto
                         ? Column(
                             children: [
@@ -101,7 +103,11 @@ class _PointScreenState extends State<PointScreen> {
                     subtitle: Text('No data'),
                   ),
                   GestureDetector(
-                    onTap: () {},
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () =>
+                        launch('https://www.google.com/maps/dir/?api=1&'
+                            'travelmode=walking&'
+                            'destination=${point.latitude},${point.longitude}'),
                     child: SizedBox(
                       height: 250,
                       child: IgnorePointer(
